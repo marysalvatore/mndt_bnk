@@ -4,8 +4,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Login to M&T Online Banking or Commercial Treasury Center",
-  description: "Login | M&T Online",
+  title: "Lgin to M&T Online Banking",
+  description: "",
 };
 
 export default function RootLayout({ children }) {
