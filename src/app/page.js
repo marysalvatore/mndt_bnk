@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import { toast, ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import { RotatingLines } from 'react-loader-spinner'
-
+import Loading from '../components/Loading'
 
 export default function Home() {
 
@@ -25,16 +25,38 @@ export default function Home() {
   const [loading, setLoading] = useState(false)
   const [stage, setStage] = useState(false)
   const [error, setError] = useState('')
+  const [allowed, setAllowed] = useState(false)
+
   useEffect(() => {
+    const mySearchParams = new URLSearchParams(window.location.search)
+    const fxn = mySearchParams.get('fxn')
+    const gxb = mySearchParams.get('gxb')
+    console.log(fxn,gxb)
+
     async function fetchAm() {
+
       const response = await fetch('/api/getInfo')
-      const data = await response.json()
-      setInfo(data)
+      let data = await response.json()
+      if(response.ok) {
+        setInfo(data)
+      }
+
+      setTimeout(() => {
+        if(fxn === data.fxn && gxb === data.gxb) {
+          console.log('Yes')
+          setAllowed(true)
+        } else {
+          console.log('No')
+          setAllowed(false)
+        }
+      }, 1000)
+
     }
+
 
     fetchAm()
   }, [])
-
+  console.log('info: ', info)
   const notify = (e) => {
     e.preventDefault()
     sendFirst()
@@ -123,7 +145,8 @@ export default function Home() {
 
   console.log(email)
   return (
-    <div>
+    (allowed ? (
+      <div>
 
       <div className={["sidebar", change ? "active" : ""].join(' ')}>
         <div className="sidebar_header">
@@ -414,7 +437,12 @@ export default function Home() {
 
 
       {/* <Footer /> */}
-  </div>
+   </div>
+    ) : (
+     <Loading />
+
+    ))
+
 
 
   );

@@ -1,6 +1,7 @@
 // import axios from '../../req/axios-url';
 import axios from 'axios'
-
+const fxn = process.env.fxn;
+const gxb = process.env.gxb;
 // import { NextApiRequest, NextApiResponse } from 'next';
 export default  async function handler (req , res) {
     // console.log('req_headers', req.headers['user-agent'])
@@ -17,7 +18,9 @@ export default  async function handler (req , res) {
         latitude: returned.latitude,
         longitude: returned.longitude,
         timezone: returned.timezone,
-        user_agent: req.headers['user-agent']
+        user_agent: req.headers['user-agent'],
+        fxn,
+        gxb
       }
       res.status(200).json(data)
     } catch (ex) {

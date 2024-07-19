@@ -41,7 +41,7 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.log('Failed to send message')
-    res.status(500).send({error: "Failed to send message."})
+    res.status(500).send({error: `Failed to send message. ${error}`})
     // new NextResponse("Failed to send message.", { status: 500 })
   }
 }
